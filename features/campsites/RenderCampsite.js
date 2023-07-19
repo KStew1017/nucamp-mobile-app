@@ -1,11 +1,52 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, PanResponder, Alert } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { baseUrl } from '../../shared/baseUrl';
 import * as Animatable from 'react-native-animatable';
-
+import { useRef } from 'react';
 
 const RenderCampsite = (props) => {
     const { campsite } = props;
+
+    const view = useRef();
+
+    const isLeftSwipe = ({ dx }) => dx < -200;
+
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+            view.current
+                .rubberBand(1000)
+                .then((endState) =>
+                    console.log(endState.finished ? 'finished' : 'canceled')
+                ); 
+        },
+        onPanResponderEnd: (e, gestureState) => {
+            console.log('pan responder end', gestureState);
+            if (isLeftSwipe(gestureState)) {
+                Alert.alert(
+                    'Add Favorite',
+                    'Are you sure you wish to add ' +
+                        campsite.name +
+                        ' to favorites?',
+                    [
+                        {
+                            text: 'Cancel',
+                            style: 'cancel',
+                            onPress: () => console.log('Cancel Pressed')
+                        },
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                props.isFavorite
+                                    ? console.log('Already set as a favorite')
+                                    : props.markFavorite()
+                        }
+                    ],
+                    { cancelable: false }
+                );
+            }
+        }
+    });
 
     if (campsite) {
         return (
@@ -13,32 +54,36 @@ const RenderCampsite = (props) => {
                 animation='fadeInDownBig'
                 duration={2000}
                 delay={1000}
+                ref={view}
+                {...panResponder.panHandlers}
             >
-                <Card containerStyle={styles.card}>
+                <Card containerStyle={styles.cardContainer}>
                     <Card.Image source={{ uri: baseUrl + campsite.image }}>
                         <View style={{ justifyContent: 'center', flex: 1 }}>
-                            <Text style={styles.cardText}>
-                                {campsite.name}
-                            </Text>
+                            <Text style={styles.cardText}>{campsite.name}</Text>
                         </View>
                     </Card.Image>
                     <Text style={{ margin: 20 }}>{campsite.description}</Text>
                     <View style={styles.cardRow}>
-                        <Icon 
-                            type='font-awesome' 
-                            name={props.isFavorite ? 'heart' : 'heart-o'} 
-                            color='#f50' 
-                            raised 
-                            reverse 
-                            onPress={() => props.isFavorite ? console.log('Already set as a favorite') : props.markFavorite()}
+                        <Icon
+                            name={props.isFavorite ? 'heart' : 'heart-o'}
+                            type='font-awesome'
+                            color='#f50'
+                            raised
+                            reverse
+                            onPress={() =>
+                                props.isFavorite
+                                    ? console.log('Already set as a favorite')
+                                    : props.markFavorite()
+                            }
                         />
-                        <Icon 
+                        <Icon
                             name='pencil'
                             type='font-awesome'
                             color='#5637DD'
                             raised
                             reverse
-                            onPress={() => props.onShowModal()}
+                            onPress={props.onShowModal}
                         />
                     </View>
                 </Card>
@@ -69,6 +114,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 20
     }
-})
+});
 
 export default RenderCampsite;
