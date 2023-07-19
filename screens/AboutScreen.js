@@ -3,6 +3,7 @@ import { Card, Text, Avatar, ListItem } from 'react-native-elements';
 import { useSelector } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
 import Loading from '../components/LoadingComponent';
+import * as Animatable from 'react-native-animatable';
 
 
 const Mission = () => {
@@ -38,23 +39,34 @@ const AboutScreen = () => {
     if (partners.errMess) {
         return (
             <ScrollView>
-                <Mission />
-                <Card title={'Community Partners'}>
-                    <Card.Title>Community Partners</Card.Title>
-                    <Card.Divider />
-                    <Text>{partners.errMess}</Text>
-                </Card>
+                <Animatable.View
+                    animation='fadeInDown'
+                    duration={2000}
+                    delay={1000}
+                >
+                    <Mission />
+                    <Card title={'Community Partners'}>
+                        <Card.Title>Community Partners</Card.Title>
+                        <Card.Divider />
+                        <Text>{partners.errMess}</Text>
+                    </Card>
+                </Animatable.View>
             </ScrollView>
         )
     }
 
     return (
         <ScrollView>
-            <Mission />
-            <Card title={'Community Partners'}>
-                <Card.Title>Community Partners</Card.Title>
-                <Card.Divider />
-                {partners.partnersArray.map((partner) => (
+            <Animatable.View
+                animation='fadeInDown'
+                duration={2000}
+                delay={1000}
+            >
+                <Mission />
+                <Card title={'Community Partners'}>
+                    <Card.Title>Community Partners</Card.Title>
+                    <Card.Divider />
+                    {partners.partnersArray.map((partner) => (
                         <ListItem key={partner.id}>
                             <Avatar rounded source={{ uri: baseUrl + partner.image}} />
                             <ListItem.Content>
@@ -62,9 +74,9 @@ const AboutScreen = () => {
                                 <ListItem.Subtitle>{partner.description}</ListItem.Subtitle>
                             </ListItem.Content>
                         </ListItem>
-                    )
-                )}
-            </Card>
+                    ))}
+                </Card>
+            </Animatable.View>
         </ScrollView>
     );
 };
