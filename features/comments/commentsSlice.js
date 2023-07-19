@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { baseUrl } from '../../shared/baseUrl';
-import { set } from 'react-native-reanimated';
 
 
 export const fetchComments = createAsyncThunk(

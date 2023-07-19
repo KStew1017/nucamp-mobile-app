@@ -63,7 +63,7 @@ const CampsiteInfoScreen = ({ route }) => {
                 )}
                 renderItem={renderCommentItem}
                 keyExtractor={(item) => item.id.toString()}
-                contentCOntainerStyle={{
+                contentContainerStyle={{
                     marginHorizontal: 20,
                     paddingVertical: 20
                 }}
@@ -91,7 +91,7 @@ const CampsiteInfoScreen = ({ route }) => {
                         startingValue={rating}
                         imageSize={40}
                         onFinishRating={(rating) => setRating(rating)}
-                        style={{ paddingTop: 10 }}
+                        style={{ paddingVertical: 10 }}
                     />
                     <Input
                         placeholder='Author'
