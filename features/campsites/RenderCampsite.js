@@ -1,15 +1,45 @@
-import { StyleSheet, Text, View, PanResponder, Alert } from 'react-native';
-import { Card, Icon } from 'react-native-elements';
+import { StyleSheet, Text, View, PanResponder, Alert, Modal, Button } from 'react-native';
+import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { baseUrl } from '../../shared/baseUrl';
+import { useRef, useState } from 'react';
+import { postComment } from '../comments/commentsSlice';
+import { useDispatch } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
-import { useRef } from 'react';
 
 const RenderCampsite = (props) => {
     const { campsite } = props;
 
     const view = useRef();
+    const dispatch = useDispatch();
 
     const isLeftSwipe = ({ dx }) => dx < -200;
+    const isRightSwipe = ({ dx }) => dx > 200;
+
+    const [showModal, setShowModal] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [author, setAuthor] = useState('');
+    const [text, setText] = useState('');
+
+    const onShowModal = () => {
+        setShowModal(!showModal);
+    };
+
+    const handleSubmit = () => {
+        const newComment = {
+            author,
+            rating,
+            text,
+            campsiteId: campsite.id
+        };
+        dispatch(postComment(newComment));
+        setShowModal(!showModal);
+    };
+
+    const resetForm = () => {
+        setRating(0);
+        setAuthor('');
+        setText('');
+    };
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -21,7 +51,6 @@ const RenderCampsite = (props) => {
                 ); 
         },
         onPanResponderEnd: (e, gestureState) => {
-            console.log('pan responder end', gestureState);
             if (isLeftSwipe(gestureState)) {
                 Alert.alert(
                     'Add Favorite',
@@ -44,6 +73,8 @@ const RenderCampsite = (props) => {
                     ],
                     { cancelable: false }
                 );
+            } else if (isRightSwipe(gestureState)) {
+                onShowModal(true);
             }
         }
     });
@@ -87,6 +118,53 @@ const RenderCampsite = (props) => {
                         />
                     </View>
                 </Card>
+                <Modal
+                    animationType='slide'
+                    transparent={false}
+                    visible={showModal}
+                    onRequestClose={() => setShowModal(!showModal)}
+                >
+                    <View style={styles.modal}>
+                        <Rating
+                            showRating
+                            startingValue={rating}
+                            imageSize={40}
+                            onFinishRating={(rating) => setRating(rating)}
+                            style={{ paddingVertical: 10 }}
+                        />
+                        <Input
+                            placeholder='Author'
+                            leftIcon={{ type: 'font-awesome', name: 'user-o' }}
+                            leftIconContainerStyle={{ paddingRight: 10 }}
+                            onChangeText={(author) => setAuthor(author)}
+                            value={author}
+                        />
+                        <Input
+                            placeholder='Comment'
+                            leftIcon={{ type: 'font-awesome', name: 'comment-o' }}
+                            leftIconContainerStyle={{ paddingRight: 10 }}
+                            onChangeText={(text) => setText(text)}
+                            value={text}
+                        />
+                        <View style={{margin: 10}}>
+                            <Button
+                                title='Submit'
+                                color='#5637DD'
+                                onPress={() => {
+                                    handleSubmit()
+                                    resetForm()
+                                }}
+                            />
+                        </View>
+                        <View style={{margin: 10}}>
+                            <Button
+                                onPress={() => setShowModal(!showModal)}
+                                color='#808080'
+                                title='Cancel'
+                            />
+                        </View>
+                    </View>
+                </Modal>
             </Animatable.View>
         );
     }
