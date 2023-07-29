@@ -29,7 +29,7 @@ const ReservationScreen = () => {
 
     const handleReservation = () => {
         Alert.alert(
-            'Begin Serach?',
+            'Begin Search?',
             `Number of Campers: ${campers}\n\nHike-In? ${hikeIn}\n\nDate: ${date.toLocaleDateString('en-US')}`,
             [
                 {
